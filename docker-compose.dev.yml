@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: paylens-postgres-dev
+    environment:
+      POSTGRES_USER: paylens
+      POSTGRES_PASSWORD: paylens
+      POSTGRES_DB: paylens
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - paylens-network
+
+  # ChromaDB Vector Database
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: paylens-chromadb-dev
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_PORT=8000
+    networks:
+      - paylens-network
+
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: paylens-ollama-dev
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - paylens-network
+
+networks:
+  paylens-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  chromadb_data:
+    driver: local
+  ollama_data:
+    driver: local
