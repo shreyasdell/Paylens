@@ -3,6 +3,7 @@ from app.agents.base import BaseAgent
 from app.models.state import InvestigationState, Transaction, LogEntry, Metric, Incident, RunbookMatch
 from app.services.chromadb_service import chromadb_service
 import logging
+import random
 from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)

@@ -15,8 +15,12 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager"""
     # Startup
     logger.info("Starting PayLens API...")
-    init_db()
-    logger.info("PayLens API started successfully")
+    try:
+        init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.warning(f"Database initialization failed (running without database): {e}")
+        logger.info("PayLens API started successfully (without database)")
     
     yield
     

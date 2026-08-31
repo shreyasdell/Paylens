@@ -1,6 +1,5 @@
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from chromadb.utils import embedding_functions
 from typing import List, Dict, Any, Optional
 import logging
 import os
@@ -18,16 +17,16 @@ class ChromaDBService:
     def __init__(self):
         self.client = None
         self.collection = None
-        self.embedding_function = None
+        self._initialized = False
         self._initialize_client()
     
     def _initialize_client(self):
-        """Initialize ChromaDB client and embedding function"""
+        """Initialize ChromaDB client without embedding function"""
         try:
             # Create persist directory if it doesn't exist
             os.makedirs(settings.CHROMADB_PERSIST_DIRECTORY, exist_ok=True)
             
-            # Initialize ChromaDB client
+            # Initialize ChromaDB client without embedding function
             self.client = chromadb.PersistentClient(
                 path=settings.CHROMADB_PERSIST_DIRECTORY,
                 settings=ChromaSettings(
@@ -36,19 +35,20 @@ class ChromaDBService:
                 )
             )
             
-            # Initialize embedding function (using default sentence transformer)
-            self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
-                model_name="all-MiniLM-L6-v2"
-            )
-            
-            logger.info("ChromaDB client initialized successfully")
+            self._initialized = True
+            logger.info("ChromaDB client initialized successfully (without embeddings)")
             
         except Exception as e:
-            logger.error(f"Failed to initialize ChromaDB client: {e}")
-            raise
+            logger.warning(f"Failed to initialize ChromaDB client: {e}")
+            logger.warning("ChromaDB features will be disabled")
+            self._initialized = False
     
     def create_collection(self, collection_name: str = "runbooks"):
         """Create or get a collection"""
+        if not self._initialized:
+            logger.warning("ChromaDB not initialized, skipping collection creation")
+            return None
+            
         try:
             # Delete existing collection if it exists
             try:
@@ -57,10 +57,9 @@ class ChromaDBService:
             except:
                 pass
             
-            # Create new collection
+            # Create new collection without embedding function
             self.collection = self.client.create_collection(
                 name=collection_name,
-                embedding_function=self.embedding_function,
                 metadata={"hnsw:space": "cosine"}
             )
             
@@ -69,7 +68,7 @@ class ChromaDBService:
             
         except Exception as e:
             logger.error(f"Failed to create collection: {e}")
-            raise
+            return None
     
     def get_collection(self, collection_name: str = "runbooks"):
         """Get existing collection"""
@@ -126,6 +125,10 @@ class ChromaDBService:
             markdown_files = list(runbooks_path.glob("*.md"))
             logger.info(f"Found {len(markdown_files)} runbook files")
             
+            if not self._initialized:
+                logger.warning("ChromaDB not initialized, skipping runbook indexing")
+                return
+            
             documents = []
             metadatas = []
             ids = []
@@ -146,7 +149,7 @@ class ChromaDBService:
                 logger.info(f"Parsed: {parsed['title']}")
             
             if documents:
-                # Add documents to collection
+                # Add documents to collection without embeddings (will use default)
                 self.collection.add(
                     documents=documents,
                     metadatas=metadatas,
@@ -163,28 +166,28 @@ class ChromaDBService:
     
     def search_runbooks(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:
         """Search for relevant runbooks"""
-        try:
-            if not self.collection:
-                logger.error("Collection not initialized")
-                return []
+        if not self._initialized or not self.collection:
+            logger.warning("ChromaDB not available, returning empty runbook results")
+            return []
             
-            results = self.collection.query(
-                query_texts=[query],
-                n_results=n_results
-            )
+        try:
+            # Simple text-based search since we don't have embeddings
+            results = self.collection.get()
             
             formatted_results = []
-            if results['documents'] and results['documents'][0]:
-                for idx, doc in enumerate(results['documents'][0]):
-                    formatted_results.append({
-                        "content": doc,
-                        "metadata": results['metadatas'][0][idx] if results['metadatas'] else {},
-                        "distance": results['distances'][0][idx] if results['distances'] else 0,
-                        "relevance_score": 1 - results['distances'][0][idx] if results['distances'] else 1
-                    })
+            if results['documents']:
+                # Simple keyword matching
+                query_lower = query.lower()
+                for idx, doc in enumerate(results['documents']):
+                    if query_lower in doc.lower():
+                        formatted_results.append({
+                            "content": doc,
+                            "metadata": results['metadatas'][idx] if results['metadatas'] else {},
+                            "relevance_score": 0.8  # Default relevance for simple match
+                        })
             
             logger.info(f"Found {len(formatted_results)} relevant runbooks for query: {query}")
-            return formatted_results
+            return formatted_results[:n_results]
             
         except Exception as e:
             logger.error(f"Failed to search runbooks: {e}")
@@ -192,11 +195,11 @@ class ChromaDBService:
     
     def get_all_runbooks(self) -> List[Dict[str, Any]]:
         """Get all indexed runbooks"""
-        try:
-            if not self.collection:
-                logger.error("Collection not initialized")
-                return []
+        if not self._initialized or not self.collection:
+            logger.warning("ChromaDB not available, returning empty runbook list")
+            return []
             
+        try:
             results = self.collection.get()
             
             formatted_results = []

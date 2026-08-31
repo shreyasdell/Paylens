@@ -33,7 +33,7 @@ class LogDB(Base):
     message = Column(Text)
     payment_id = Column(String, ForeignKey("transactions.id"), nullable=True, index=True)
     service = Column(String, index=True)
-    metadata = Column(Text, nullable=True)  # JSON string
+    log_metadata = Column(Text, nullable=True)  # JSON string (renamed from metadata)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships
@@ -100,4 +100,4 @@ class InvestigationDB(Base):
     completed_at = Column(DateTime, nullable=True)
     
     # Store full state as JSON
-    state_json = Column(Text, nullable=True)
+    investigation_state_json = Column(Text, nullable=True)  # Renamed from state_json

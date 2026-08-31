@@ -70,7 +70,7 @@ def seed_database():
                 # Convert metadata dict to JSON string
                 if isinstance(log_data.get("metadata"), dict):
                     import json
-                    log_data["metadata"] = json.dumps(log_data["metadata"])
+                    log_data["log_metadata"] = json.dumps(log_data["metadata"])
                 
                 log = LogDB(**log_data)
                 db.add(log)

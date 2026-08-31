@@ -26,7 +26,7 @@ class InvestigationWorkflow:
     def _build_graph(self):
         """Build the LangGraph workflow"""
         try:
-            # Create a new graph
+            # Create a new graph with Pydantic state
             workflow = StateGraph(InvestigationState)
             
             # Add nodes (agents)
@@ -115,7 +115,7 @@ class InvestigationWorkflow:
         try:
             logger.info(f"Starting investigation: {initial_state.investigation_type}")
             
-            # Run the graph
+            # Run the graph - it returns the state object directly
             final_state = await self.graph.ainvoke(initial_state)
             
             logger.info(f"Investigation completed with status: {final_state.status}")
