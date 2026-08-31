@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayLens - Payment AIOps Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+        }
+        
+        .result-item label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .result-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.investigating {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 PayLens</h1>
+            <p>AI-Powered Payment AIOps Platform</p>
+        </div>
+        
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('payment')">Payment Investigation</button>
+                <button class="tab" onclick="switchTab('incident')">Incident Investigation</button>
+                <button class="tab" onclick="switchTab('support')">Support Assistant</button>
+            </div>
+            
+            <!-- Payment Investigation -->
+            <div id="payment-tab" class="tab-content active">
+                <h2>Payment Investigation</h2>
+                <div class="input-group">
+                    <label for="payment-id">Payment ID</label>
+                    <input type="text" id="payment-id" placeholder="e.g., PAY_12345" value="PAY_12345">
+                </div>
+                <button class="button" onclick="investigatePayment()">Investigate Payment</button>
+                <div id="payment-result"></div>
+            </div>
+            
+            <!-- Incident Investigation -->
+            <div id="incident-tab" class="tab-content">
+                <h2>Incident Investigation</h2>
+                <div class="input-group">
+                    <label for="incident-id">Incident ID</label>
+                    <input type="text" id="incident-id" placeholder="e.g., INC100" value="INC100">
+                </div>
+                <button class="button" onclick="investigateIncident()">Investigate Incident</button>
+                <div id="incident-result"></div>
+            </div>
+            
+            <!-- Support Assistant -->
+            <div id="support-tab" class="tab-content">
+                <h2>Support Assistant</h2>
+                <div class="input-group">
+                    <label for="support-query">Customer Query</label>
+                    <textarea id="support-query" rows="4" placeholder="e.g., Why did my payment fail?">Why did my payment fail?</textarea>
+                </div>
+                <button class="button" onclick="supportQuery()">Submit Query</button>
+                <div id="support-result"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = '<div class="loading">Investigating</div>';
+        }
+        
+        function showError(elementId, error) {
+            document.getElementById(elementId).innerHTML = `<div class="error">Error: ${error}</div>`;
+        }
+        
+        function showResult(elementId, data) {
+            const statusClass = data.status === 'completed' ? 'completed' : 'failed';
+            const statusLabel = data.status === 'completed' ? 'Completed' : 'Failed';
+            
+            let html = `
+                <div class="result">
+                    <h3>Investigation Result</h3>
+                    <div class="result-item">
+                        <label>Status:</label>
+                        <span class="status ${statusClass}">${statusLabel}</span>
+                    </div>
+            `;
+            
+            if (data.payment_id) {
+                html += `
+                    <div class="result-item">
+                        <label>Payment ID:</label>
+                        <p>${data.payment_id}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.incident_id) {
+                html += `
+                    <div class="result-item">
+                        <label>Incident ID:</label>
+                        <p>${data.incident_id}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.root_cause) {
+                html += `
+                    <div class="result-item">
+                        <label>Root Cause:</label>
+                        <p>${data.root_cause.description || data.root_cause}</p>
+                    </div>
+                    <div class="result-item">
+                        <label>Confidence:</label>
+                        <p>${(data.confidence * 100).toFixed(1)}%</p>
+                    </div>
+                `;
+            }
+            
+            if (data.recommendation) {
+                html += `
+                    <div class="result-item">
+                        <label>Recommendation:</label>
+                        <p>${data.recommendation.action || data.recommendation}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.customer_explanation) {
+                html += `
+                    <div class="result-item">
+                        <label>Customer Explanation:</label>
+                        <p>${data.customer_explanation}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.internal_explanation) {
+                html += `
+                    <div class="result-item">
+                        <label>Internal Explanation:</label>
+                        <pre>${data.internal_explanation}</pre>
+                    </div>
+                `;
+            }
+            
+            if (data.error_message) {
+                html += `
+                    <div class="result-item">
+                        <label>Error:</label>
+                        <p style="color: #721c24;">${data.error_message}</p>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            document.getElementById(elementId).innerHTML = html;
+        }
+        
+        async function investigatePayment() {
+            const paymentId = document.getElementById('payment-id').value;
+            if (!paymentId) {
+                showError('payment-result', 'Please enter a payment ID');
+                return;
+            }
+            
+            showLoading('payment-result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/investigate/payment?payment_id=${paymentId}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showResult('payment-result', result.data);
+                } else {
+                    showError('payment-result', result.message || 'Investigation failed');
+                }
+            } catch (error) {
+                showError('payment-result', error.message);
+            }
+        }
+        
+        async function investigateIncident() {
+            const incidentId = document.getElementById('incident-id').value;
+            if (!incidentId) {
+                showError('incident-result', 'Please enter an incident ID');
+                return;
+            }
+            
+            showLoading('incident-result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/investigate/incident?incident_id=${incidentId}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showResult('incident-result', result.data);
+                } else {
+                    showError('incident-result', result.message || 'Investigation failed');
+                }
+            } catch (error) {
+                showError('incident-result', error.message);
+            }
+        }
+        
+        async function supportQuery() {
+            const query = document.getElementById('support-query').value;
+            if (!query) {
+                showError('support-result', 'Please enter a query');
+                return;
+            }
+            
+            showLoading('support-result');
+            
+            try {
+                const response = await fetch(`${API_BASE}/support/query`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showResult('support-result', result.data);
+                } else {
+                    showError('support-result', result.message || 'Query failed');
+                }
+            } catch (error) {
+                showError('support-result', error.message);
+            }
+        }
+    </script>
+</body>
+</html>

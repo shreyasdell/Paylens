@@ -115,8 +115,15 @@ class InvestigationWorkflow:
         try:
             logger.info(f"Starting investigation: {initial_state.investigation_type}")
             
-            # Run the graph - it returns the state object directly
-            final_state = await self.graph.ainvoke(initial_state)
+            # Run the graph - LangGraph may return dict or InvestigationState
+            result = await self.graph.ainvoke(initial_state)
+            
+            # Handle both dict and InvestigationState returns
+            if isinstance(result, dict):
+                logger.info("Graph returned dict, converting to InvestigationState")
+                final_state = InvestigationState(**result)
+            else:
+                final_state = result
             
             logger.info(f"Investigation completed with status: {final_state.status}")
             return final_state
