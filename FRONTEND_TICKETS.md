@@ -109,13 +109,13 @@
 - [x] List affected payment IDs with links
 - [x] Show root cause summary and recommendation
 
-### Ticket 14: Support Assistant Page
-- [ ] Create support assistant page structure
-- [ ] Build chat-style interface
-- [ ] Implement customer message input
-- [ ] Display AI-generated responses
-- [ ] Add collapsible "Technical Details" panel
-- [ ] Style for support agent console aesthetic
+### Ticket 14: Support Assistant Page ✅ COMPLETED
+- [x] Create support assistant page structure
+- [x] Build chat-style interface
+- [x] Implement customer message input
+- [x] Display AI-generated responses
+- [x] Add collapsible "Technical Details" panel
+- [x] Style for support agent console aesthetic
 
 ### Ticket 15: Runbooks Page
 - [ ] Create runbooks page structure

@@ -45,6 +45,7 @@ module.exports = {
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-in': 'slideIn 0.3s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce': 'bounce 1.4s infinite ease-in-out both',
       },
       keyframes: {
         fadeIn: {
@@ -54,6 +55,10 @@ module.exports = {
         slideIn: {
           '0%': { transform: 'translateY(-10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        bounce: {
+          '0%, 80%, 100%': { transform: 'scale(0)' },
+          '40%': { transform: 'scale(1)' },
         },
       },
     },
