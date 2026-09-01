@@ -46,19 +46,21 @@ export function DashboardChart() {
   }));
 
   return (
-    <div className="card h-80">
-      <h3 className="text-lg font-semibold text-white mb-4">Payment Metrics (24h)</h3>
+    <div className="card h-64 lg:h-80">
+      <h3 className="text-base lg:text-lg font-semibold text-white mb-4">Payment Metrics (24h)</h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
           <XAxis 
             dataKey="time" 
             stroke="#94a3b8"
-            fontSize={12}
+            fontSize={10}
+            tick={{ fontSize: 10 }}
           />
           <YAxis 
             stroke="#94a3b8"
-            fontSize={12}
+            fontSize={10}
+            tick={{ fontSize: 10 }}
           />
           <Tooltip 
             contentStyle={{

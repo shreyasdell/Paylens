@@ -69,16 +69,16 @@ export function DashboardKPICards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
       {kpiCards.map((card, index) => (
         <div key={index} className="card">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-400 mb-1">{card.title}</p>
-              <p className="text-2xl font-bold text-white">{card.value}</p>
+            <div className="flex-1">
+              <p className="text-xs lg:text-sm text-gray-400 mb-1">{card.title}</p>
+              <p className="text-lg lg:text-2xl font-bold text-white">{card.value}</p>
             </div>
-            <div className={`p-3 rounded-lg ${card.bgColor}`}>
-              <card.icon className={`h-6 w-6 ${card.color}`} />
+            <div className={`p-2 lg:p-3 rounded-lg ${card.bgColor}`}>
+              <card.icon className={`h-4 w-4 lg:h-6 lg:w-6 ${card.color}`} />
             </div>
           </div>
         </div>

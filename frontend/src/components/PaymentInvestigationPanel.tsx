@@ -54,15 +54,15 @@ export function PaymentInvestigationPanel({ paymentId }: PaymentInvestigationPan
   return (
     <div className="space-y-6">
       {/* 3-Panel Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Left Panel: Transaction Summary */}
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Transaction Summary</h3>
+          <h3 className="text-base lg:text-lg font-semibold text-white mb-4">Transaction Summary</h3>
           {data.transaction ? (
             <div className="space-y-3">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Payment ID</p>
-                <p className="font-mono-ids text-gray-300">{data.transaction.payment_id}</p>
+                <p className="font-mono-ids text-gray-300 text-xs">{data.transaction.payment_id}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Amount</p>
@@ -70,15 +70,15 @@ export function PaymentInvestigationPanel({ paymentId }: PaymentInvestigationPan
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Issuer</p>
-                <p className="text-gray-300">{data.transaction.issuer}</p>
+                <p className="text-gray-300 text-sm">{data.transaction.issuer}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Payment Method</p>
-                <p className="text-gray-300">{data.transaction.payment_method}</p>
+                <p className="text-gray-300 text-sm">{data.transaction.payment_method}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">Status</p>
-                <p className="text-gray-300">{data.transaction.status}</p>
+                <p className="text-gray-300 text-sm">{data.transaction.status}</p>
               </div>
               {data.transaction.error_code && (
                 <div>
@@ -88,17 +88,17 @@ export function PaymentInvestigationPanel({ paymentId }: PaymentInvestigationPan
               )}
               <div>
                 <p className="text-xs text-gray-500 mb-1">Timestamp</p>
-                <p className="text-gray-300">{formatTimestamp(data.transaction.timestamp)}</p>
+                <p className="text-gray-300 text-xs">{formatTimestamp(data.transaction.timestamp)}</p>
               </div>
             </div>
           ) : (
-            <p className="text-gray-400">No transaction data available</p>
+            <p className="text-gray-400 text-sm">No transaction data available</p>
           )}
         </div>
 
         {/* Center Panel: Agent Trace */}
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Agent Trace</h3>
+          <h3 className="text-base lg:text-lg font-semibold text-white mb-4">Agent Trace</h3>
           <div className="space-y-4">
             <AgentTraceStep
               status="done"
@@ -131,8 +131,8 @@ export function PaymentInvestigationPanel({ paymentId }: PaymentInvestigationPan
 
         {/* Right Panel: Evidence */}
         <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Evidence</h3>
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="text-base lg:text-lg font-semibold text-white mb-4">Evidence</h3>
+          <div className="space-y-3 max-h-64 lg:max-h-96 overflow-y-auto">
             {data.logs.length > 0 && (
               <EvidenceCard
                 source="Log"

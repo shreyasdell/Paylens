@@ -5,17 +5,17 @@ import { PaymentInvestigationPanel } from "@/components/PaymentInvestigationPane
 export default function InvestigatePage() {
   return (
     <Layout>
-      <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-white">Payment Investigation</h1>
-          <p className="mt-2 text-gray-400">Investigate payment failures and root causes</p>
+      <div className="p-4 lg:p-8">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-xl lg:text-2xl font-semibold text-white">Payment Investigation</h1>
+          <p className="mt-2 text-gray-400 text-sm lg:text-base">Investigate payment failures and root causes</p>
         </div>
         
         <PaymentInvestigationSearch />
         
         {/* Default view - show recent or instructions */}
         <div className="card">
-          <p className="text-gray-400">Enter a payment ID above to start investigation</p>
+          <p className="text-gray-400 text-sm">Enter a payment ID above to start investigation</p>
         </div>
       </div>
     </Layout>
