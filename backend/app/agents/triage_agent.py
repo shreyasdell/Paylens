@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from app.agents.base import BaseAgent
 from app.models.state import InvestigationState, InvestigationType
+from app.services.llm_service import llm_service
 import logging
 import re
 
@@ -16,18 +17,20 @@ class TriageAgent(BaseAgent):
     async def process(self, state: InvestigationState) -> InvestigationState:
         """Process the triage logic"""
         try:
-            # Determine investigation type based on input
-            if state.payment_id:
-                state.investigation_type = InvestigationType.PAYMENT
-                logger.info(f"Payment investigation initiated for: {state.payment_id}")
-            elif state.incident_id:
-                state.investigation_type = InvestigationType.INCIDENT
-                logger.info(f"Incident investigation initiated for: {state.incident_id}")
-            elif state.customer_query:
-                state.investigation_type = InvestigationType.SUPPORT
-                logger.info(f"Support investigation initiated for query: {state.customer_query[:50]}...")
-            else:
-                raise ValueError("No valid input provided (payment_id, incident_id, or customer_query required)")
+            # Try LLM-based triage for smarter categorization
+            try:
+                llm_type = await self._llm_triage(state)
+                if llm_type:
+                    state.investigation_type = llm_type
+                    logger.info(f"LLM triage identified as: {llm_type.value}")
+                else:
+                    # Fallback to rule-based
+                    state.investigation_type = self._rule_based_triage(state)
+                    logger.info(f"Rule-based triage identified as: {state.investigation_type.value}")
+            except Exception as e:
+                logger.warning(f"LLM triage failed, falling back to rule-based: {e}")
+                state.investigation_type = self._rule_based_triage(state)
+                logger.info(f"Rule-based triage identified as: {state.investigation_type.value}")
             
             # Validate input format
             if state.payment_id and not self._validate_payment_id(state.payment_id):
@@ -49,6 +52,40 @@ class TriageAgent(BaseAgent):
             state.error_message = f"Triage failed: {str(e)}"
             state.status = "failed"
             return state
+    
+    def _rule_based_triage(self, state: InvestigationState) -> InvestigationType:
+        """Rule-based triage logic (fallback)"""
+        if state.payment_id:
+            return InvestigationType.PAYMENT
+        elif state.incident_id:
+            return InvestigationType.INCIDENT
+        elif state.customer_query:
+            return InvestigationType.SUPPORT
+        else:
+            raise ValueError("No valid input provided (payment_id, incident_id, or customer_query required)")
+    
+    async def _llm_triage(self, state: InvestigationState) -> InvestigationType:
+        """Use LLM for smarter triage"""
+        input_data = {
+            "payment_id": state.payment_id,
+            "incident_id": state.incident_id,
+            "customer_query": state.customer_query
+        }
+        
+        llm_response = await llm_service.triage_investigation(input_data)
+        
+        # Parse LLM response
+        response_lower = llm_response.lower().strip()
+        
+        if "payment" in response_lower:
+            return InvestigationType.PAYMENT
+        elif "incident" in response_lower:
+            return InvestigationType.INCIDENT
+        elif "support" in response_lower:
+            return InvestigationType.SUPPORT
+        else:
+            # If LLM response is unclear, fall back to rule-based
+            return None
     
     def _validate_payment_id(self, payment_id: str) -> bool:
         """Validate payment ID format"""
