@@ -2,6 +2,7 @@ from typing import Dict, Any
 from app.agents.base import BaseAgent
 from app.models.state import InvestigationState, Recommendation, ConfidenceLevel
 from app.core.config import settings
+from app.services.llm_service import llm_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,14 +31,26 @@ class ResolutionAgent(BaseAgent):
                 state.requires_human_review = True
                 return state
             
-            # Generate recommendation based on root cause and confidence
-            recommendation = await self._generate_recommendation(state)
-            state.recommendation = recommendation
+            # Try LLM-based recommendation first
+            try:
+                llm_recommendation = await self._llm_recommendation(state)
+                if llm_recommendation:
+                    state.recommendation = llm_recommendation
+                    logger.info(f"LLM recommendation generated: {llm_recommendation.action}")
+                else:
+                    # Fallback to rule-based
+                    recommendation = await self._generate_recommendation(state)
+                    state.recommendation = recommendation
+                    logger.info(f"Rule-based recommendation generated: {recommendation.action}")
+            except Exception as e:
+                logger.warning(f"LLM recommendation failed, falling back to rule-based: {e}")
+                recommendation = await self._generate_recommendation(state)
+                state.recommendation = recommendation
+                logger.info(f"Rule-based recommendation generated: {recommendation.action}")
             
             # Determine if human review is required based on confidence
             state.requires_human_review = self._requires_human_review(state)
             
-            logger.info(f"Recommendation generated: {recommendation.action}")
             logger.info(f"Human review required: {state.requires_human_review}")
             
             state.status = "recommendation_generated"
@@ -48,6 +61,71 @@ class ResolutionAgent(BaseAgent):
             state.error_message = f"Resolution generation failed: {str(e)}"
             state.status = "failed"
             return state
+    
+    async def _llm_recommendation(self, state: InvestigationState) -> Recommendation:
+        """Use LLM to generate recommendation"""
+        root_cause_str = f"{state.root_cause.category.value} - {state.root_cause.description}"
+        context = {
+            "root_cause": root_cause_str,
+            "confidence": state.confidence,
+            "transaction": state.transaction.__dict__ if state.transaction else None,
+            "incidents": len(state.incidents) if state.incidents else 0
+        }
+        
+        llm_response = await llm_service.generate_recommendation(root_cause_str, context)
+        
+        # Parse LLM response to extract recommendation components
+        # This is a simplified parser - in production you'd want more robust parsing
+        response_lower = llm_response.lower()
+        
+        # Extract action (first line or first sentence)
+        action = llm_response.split('\n')[0].strip()
+        if len(action) > 200:
+            action = action[:200] + "..."
+        
+        # Extract priority
+        priority = "MEDIUM"  # Default
+        if "critical" in response_lower:
+            priority = "CRITICAL"
+        elif "high" in response_lower:
+            priority = "HIGH"
+        elif "low" in response_lower:
+            priority = "LOW"
+        
+        # Extract estimated impact
+        estimated_impact = "Based on LLM analysis"
+        if "impact" in response_lower:
+            # Try to extract impact statement
+            import re
+            impact_match = re.search(r'impact[:\s]*(.*?)(?:\n|$)', response_lower)
+            if impact_match:
+                estimated_impact = impact_match.group(1).strip().capitalize()
+        
+        # Extract steps
+        steps = []
+        import re
+        step_matches = re.findall(r'\d+\.\s*(.*?)(?:\n|$)', llm_response)
+        if step_matches:
+            steps = [step.strip() for step in step_matches[:5]]  # Limit to 5 steps
+        else:
+            # If no numbered steps, create from response
+            sentences = llm_response.split('. ')
+            steps = [s.strip() for s in sentences[1:4] if s.strip()]  # Take 2-3 sentences after action
+        
+        if not steps:
+            steps = ["Review LLM analysis", "Implement recommended action", "Monitor results"]
+        
+        # Determine if automation is needed
+        requires_automation = any(keyword in response_lower for keyword in 
+                                   ['automate', 'automatic', 'retry', 'route', 'switch'])
+        
+        return Recommendation(
+            action=action,
+            priority=priority,
+            estimated_impact=estimated_impact,
+            steps=steps,
+            requires_automation=requires_automation
+        )
     
     async def _generate_recommendation(self, state: InvestigationState) -> Recommendation:
         """Generate recommendation based on root cause"""
