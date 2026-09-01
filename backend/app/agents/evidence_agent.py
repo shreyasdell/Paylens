@@ -2,6 +2,7 @@ from typing import Dict, Any, List
 from app.agents.base import BaseAgent
 from app.models.state import InvestigationState, Transaction, LogEntry, Metric, Incident, RunbookMatch
 from app.services.chromadb_service import chromadb_service
+from app.services.llm_service import llm_service
 import logging
 import random
 from datetime import datetime, timedelta
@@ -89,23 +90,17 @@ class EvidenceAgent(BaseAgent):
     async def _search_runbooks(self, state: InvestigationState):
         """Search runbooks for relevant information"""
         try:
-            # Build search query based on available information
-            query_parts = []
-            
-            if state.transaction and state.transaction.error_code:
-                query_parts.append(f"error code {state.transaction.error_code}")
-            
-            if state.transaction:
-                query_parts.append(f"payment status {state.transaction.status}")
-            
-            if state.incidents:
-                for incident in state.incidents:
-                    query_parts.append(incident.issue.lower())
-            
-            if state.customer_query:
-                query_parts.append(state.customer_query.lower())
-            
-            query = " ".join(query_parts) if query_parts else "payment failure"
+            # Try LLM-enhanced query generation first
+            try:
+                llm_query = await self._llm_generate_search_query(state)
+                if llm_query:
+                    query = llm_query
+                    logger.info(f"Using LLM-generated search query: {query}")
+                else:
+                    query = self._build_search_query(state)
+            except Exception as e:
+                logger.warning(f"LLM query generation failed, using rule-based: {e}")
+                query = self._build_search_query(state)
             
             # Search runbooks
             results = chromadb_service.search_runbooks(query, n_results=3)
@@ -126,6 +121,57 @@ class EvidenceAgent(BaseAgent):
         except Exception as e:
             logger.error(f"Runbook search failed: {e}")
             state.runbook_matches = []
+    
+    def _build_search_query(self, state: InvestigationState) -> str:
+        """Build search query based on available information (rule-based fallback)"""
+        query_parts = []
+        
+        if state.transaction and state.transaction.error_code:
+            query_parts.append(f"error code {state.transaction.error_code}")
+        
+        if state.transaction:
+            query_parts.append(f"payment status {state.transaction.status}")
+        
+        if state.incidents:
+            for incident in state.incidents:
+                query_parts.append(incident.issue.lower())
+        
+        if state.customer_query:
+            query_parts.append(state.customer_query.lower())
+        
+        return " ".join(query_parts) if query_parts else "payment failure"
+    
+    async def _llm_generate_search_query(self, state: InvestigationState) -> str:
+        """Use LLM to generate optimized search query for runbooks"""
+        context = {
+            "error_code": state.transaction.error_code if state.transaction else None,
+            "status": state.transaction.status if state.transaction else None,
+            "issuer": state.transaction.issuer if state.transaction else None,
+            "incidents": [incident.issue for incident in state.incidents] if state.incidents else [],
+            "customer_query": state.customer_query
+        }
+        
+        prompt = f"""Generate an optimized search query for finding relevant runbooks based on this payment investigation context:
+
+Context:
+- Error Code: {context['error_code']}
+- Payment Status: {context['status']}
+- Issuer: {context['issuer']}
+- Related Incidents: {context['incidents']}
+- Customer Query: {context['customer_query']}
+
+Generate a concise search query (2-5 keywords) that would find the most relevant operational runbooks."""
+        
+        llm_response = await llm_service.generate_response(prompt)
+        
+        # Clean up the response
+        query = llm_response.strip()
+        # Remove common LLM artifacts
+        query = query.replace("Search query:", "").replace("Query:", "").strip()
+        # Take first line if multiple
+        query = query.split('\n')[0].strip()
+        
+        return query if query else None
     
     def _simulate_transaction(self, payment_id: str) -> Transaction:
         """Simulate transaction retrieval (replace with actual DB query)"""
