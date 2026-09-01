@@ -117,12 +117,12 @@
 - [x] Add collapsible "Technical Details" panel
 - [x] Style for support agent console aesthetic
 
-### Ticket 15: Runbooks Page
-- [ ] Create runbooks page structure
-- [ ] Build runbook list with search
-- [ ] Implement markdown rendering
-- [ ] Add runbook detail view
-- [ ] Style for documentation readability
+### Ticket 15: Runbooks Page ✅ COMPLETED
+- [x] Create runbooks page structure
+- [x] Build runbook list with search
+- [x] Implement markdown rendering
+- [x] Add runbook detail view
+- [x] Style for documentation readability
 
 ## Phase 4: Polish & Testing
 
