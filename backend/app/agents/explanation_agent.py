@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from app.agents.base import BaseAgent
 from app.models.state import InvestigationState
+from app.services.llm_service import llm_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,13 +18,25 @@ class ExplanationAgent(BaseAgent):
         try:
             logger.info("Generating explanations")
             
-            # Generate internal technical explanation
-            state.internal_explanation = await self._generate_internal_explanation(state)
-            
-            # Generate customer-friendly explanation
-            state.customer_explanation = await self._generate_customer_explanation(state)
-            
-            logger.info("Explanations generated successfully")
+            # Try to use LLM for explanations first
+            try:
+                state_dict = {
+                    "root_cause": state.root_cause.__dict__ if state.root_cause else None,
+                    "confidence": state.confidence,
+                    "transaction": state.transaction.__dict__ if state.transaction else None,
+                    "recommendation": state.recommendation.__dict__ if state.recommendation else None
+                }
+                
+                state.internal_explanation = await llm_service.generate_internal_explanation(state_dict)
+                state.customer_explanation = await llm_service.generate_customer_explanation(state_dict)
+                
+                logger.info("LLM explanations generated successfully")
+            except Exception as e:
+                logger.warning(f"LLM explanation generation failed, falling back to rule-based: {e}")
+                
+                # Fallback to rule-based
+                state.internal_explanation = await self._generate_internal_explanation(state)
+                state.customer_explanation = await self._generate_customer_explanation(state)
             
             state.status = "completed"
             return state

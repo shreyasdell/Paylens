@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 from app.agents.base import BaseAgent
 from app.models.state import InvestigationState, RootCause, CandidateCause, RootCauseCategory, ConfidenceLevel
+from app.services.llm_service import llm_service
 import logging
 from datetime import datetime
 
@@ -18,7 +19,20 @@ class RootCauseAgent(BaseAgent):
         try:
             logger.info("Performing root cause analysis")
             
-            # Generate candidate causes based on evidence
+            # Try to use LLM for analysis first
+            try:
+                llm_result = await self._llm_analysis(state)
+                if llm_result:
+                    state.root_cause = llm_result["root_cause"]
+                    state.confidence = llm_result["confidence"]
+                    state.confidence_level = self._determine_confidence_level(llm_result["confidence"])
+                    state.status = "root_cause_identified"
+                    logger.info(f"LLM root cause identified: {llm_result['root_cause'].category.value} with confidence {llm_result['confidence']}")
+                    return state
+            except Exception as e:
+                logger.warning(f"LLM analysis failed, falling back to rule-based: {e}")
+            
+            # Fallback to rule-based analysis
             candidate_causes = await self._generate_candidate_causes(state)
             state.candidate_causes = candidate_causes
             
@@ -36,7 +50,7 @@ class RootCauseAgent(BaseAgent):
                 state.confidence = best_cause.confidence
                 state.confidence_level = self._determine_confidence_level(best_cause.confidence)
                 
-                logger.info(f"Root cause identified: {best_cause.category.value} with confidence {best_cause.confidence}")
+                logger.info(f"Rule-based root cause identified: {best_cause.category.value} with confidence {best_cause.confidence}")
             else:
                 # Fallback to unknown if no causes identified
                 state.root_cause = RootCause(
@@ -48,7 +62,7 @@ class RootCauseAgent(BaseAgent):
                 state.confidence = 0.0
                 state.confidence_level = ConfidenceLevel.LOW
             
-            state.status = "root_cause_identified"
+            state.status = "root_c_identified"
             return state
             
         except Exception as e:
@@ -56,6 +70,54 @@ class RootCauseAgent(BaseAgent):
             state.error_message = f"Root cause analysis failed: {str(e)}"
             state.status = "failed"
             return state
+    
+    async def _llm_analysis(self, state: InvestigationState) -> Dict[str, Any]:
+        """Use LLM to analyze root cause"""
+        evidence = {
+            "error_code": state.transaction.error_code if state.transaction else None,
+            "status": state.transaction.status if state.transaction else None,
+            "issuer": state.transaction.issuer if state.transaction else None,
+            "logs": state.logs,
+            "metrics": state.metrics,
+            "incidents": state.incidents
+        }
+        
+        llm_response = await llm_service.analyze_root_cause(evidence)
+        
+        # Parse LLM response
+        # This is a simplified parser - in production you'd want more robust parsing
+        response_lower = llm_response.lower()
+        
+        # Try to extract category from response
+        category = RootCauseCategory.UNKNOWN
+        for cat in RootCauseCategory:
+            if cat.value.lower() in response_lower:
+                category = cat
+                break
+        
+        # Extract confidence (look for percentage or decimal)
+        confidence = 0.7  # Default confidence
+        import re
+        confidence_match = re.search(r'(\d+\.?\d*)', response_lower)
+        if confidence_match:
+            conf_value = float(confidence_match.group(1))
+            if conf_value > 1.0:
+                confidence = conf_value / 100.0
+            else:
+                confidence = conf_value
+        
+        # Extract description
+        description = llm_response
+        
+        return {
+            "root_cause": RootCause(
+                category=category,
+                description=description,
+                confidence=confidence,
+                evidence_summary=["LLM-generated analysis"]
+            ),
+            "confidence": confidence
+        }
     
     async def _generate_candidate_causes(self, state: InvestigationState) -> List[CandidateCause]:
         """Generate candidate causes based on collected evidence"""
