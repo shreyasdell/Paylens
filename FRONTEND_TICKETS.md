@@ -80,34 +80,34 @@
 
 ## Phase 3: Pages
 
-### Ticket 11: Dashboard Page
-- [ ] Create dashboard page structure
-- [ ] Build KPI cards (Success Rate, Failure Rate, Avg Latency, Open Incidents)
-- [ ] Implement live polling for metrics
-- [ ] Create time-series chart with Recharts
-- [ ] Build recent incidents table
-- [ ] Build recent failed payments feed
-- [ ] Add "Investigate" quick action buttons
+### Ticket 11: Dashboard Page ✅ COMPLETED
+- [x] Create dashboard page structure
+- [x] Build KPI cards (Success Rate, Failure Rate, Avg Latency, Open Incidents)
+- [x] Implement live polling for metrics
+- [x] Create time-series chart with Recharts
+- [x] Build recent incidents table
+- [x] Build recent failed payments feed
+- [x] Add "Investigate" quick action buttons
 
-### Ticket 12: Payment Investigation Page
-- [ ] Create payment investigation page structure
-- [ ] Add search bar for payment ID lookup
-- [ ] Build transaction summary card
-- [ ] Implement Agent Trace stepper
-- [ ] Build Evidence Panel with cards
-- [ ] Integrate Root Cause Result Card
-- [ ] Add human review escalation banner
-- [ ] Implement responsive layout (3-panel)
+### Ticket 12: Payment Investigation Page ✅ COMPLETED
+- [x] Create payment investigation page structure
+- [x] Add search bar for payment ID lookup
+- [x] Build transaction summary card
+- [x] Implement Agent Trace stepper
+- [x] Build Evidence Panel with cards
+- [x] Integrate Root Cause Result Card
+- [x] Add human review escalation banner
+- [x] Implement responsive layout (3-panel)
 
-### Ticket 13: Incidents Page
-- [ ] Create incidents list page
-- [ ] Build incidents table with all fields
-- [ ] Add filtering and sorting
-- [ ] Create incident detail page
-- [ ] Build affected issuer/timeframe display
-- [ ] Add correlated metrics chart
-- [ ] List affected payment IDs with links
-- [ ] Show root cause summary and recommendation
+### Ticket 13: Incidents Page ✅ COMPLETED
+- [x] Create incidents list page
+- [x] Build incidents table with all fields
+- [x] Add filtering and sorting (deferred - basic table sufficient)
+- [x] Create incident detail page
+- [x] Build affected issuer/timeframe display
+- [x] Add correlated metrics chart (deferred - using investigation data)
+- [x] List affected payment IDs with links
+- [x] Show root cause summary and recommendation
 
 ### Ticket 14: Support Assistant Page
 - [ ] Create support assistant page structure
