@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PayLens - Payment AIOps Platform</title>
+    <title>PayLens - AI-Powered Payment AIOps Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,186 +13,282 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            color: #fff;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 40px 20px;
         }
         
         .header {
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
         }
         
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
         }
         
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            opacity: 0.8;
+            font-weight: 300;
         }
         
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+        .header .subtitle {
             font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus,
-        .input-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .button:disabled {
             opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+            margin-top: 10px;
+        }
+        
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
         
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .tab {
-            padding: 10px 20px;
-            background: #f0f0f0;
+            flex: 1;
+            padding: 16px 24px;
+            background: transparent;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .tab span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tab:hover {
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .tab.active {
-            background: #667eea;
             color: white;
         }
         
-        .tab:hover:not(.active) {
-            background: #e0e0e0;
+        .tab.active::before {
+            opacity: 1;
         }
         
         .tab-content {
             display: none;
+            animation: fadeIn 0.4s ease-out;
         }
         
         .tab-content.active {
             display: block;
         }
         
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .button:hover::before {
+            left: 100%;
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .result {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 0.5s ease-out;
         }
         
         .result h3 {
-            color: #333;
-            margin-bottom: 15px;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
         }
         
         .result-item {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
         }
         
         .result-item label {
             font-weight: 600;
-            color: #555;
+            color: rgba(255, 255, 255, 0.7);
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .result-item p {
-            color: #666;
-            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.7;
+            font-size: 1rem;
         }
         
         .status {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 8px 20px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .status.completed {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
         }
         
         .status.failed {
-            background: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 92, 67, 0.3);
         }
         
         .status.investigating {
-            background: #fff3cd;
-            color: #856404;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
         }
         
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
         }
         
         .loading::after {
@@ -206,21 +303,118 @@
         }
         
         .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(235, 51, 73, 0.2) 0%, rgba(244, 92, 67, 0.2) 100%);
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 12px;
             margin-top: 20px;
+            border: 1px solid rgba(244, 92, 67, 0.3);
         }
         
         pre {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e0e0e0;
+            padding: 20px;
+            border-radius: 12px;
             overflow-x: auto;
             font-size: 0.9rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .steps-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        
+        .steps-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .steps-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #38ef7d;
+            font-weight: bold;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -229,18 +423,19 @@
         <div class="header">
             <h1>🔍 PayLens</h1>
             <p>AI-Powered Payment AIOps Platform</p>
+            <div class="subtitle">Intelligent Payment Failure Investigation & Root Cause Analysis</div>
         </div>
         
-        <div class="card">
+        <div class="main-card">
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('payment')">Payment Investigation</button>
-                <button class="tab" onclick="switchTab('incident')">Incident Investigation</button>
-                <button class="tab" onclick="switchTab('support')">Support Assistant</button>
+                <button class="tab active" onclick="switchTab('payment')"><span>💳 Payment Investigation</span></button>
+                <button class="tab" onclick="switchTab('incident')"><span>🚨 Incident Investigation</span></button>
+                <button class="tab" onclick="switchTab('support')"><span>💬 Support Assistant</span></button>
             </div>
             
             <!-- Payment Investigation -->
             <div id="payment-tab" class="tab-content active">
-                <h2>Payment Investigation</h2>
+                <h2 style="margin-bottom: 25px; font-weight: 600;">Payment Investigation</h2>
                 <div class="input-group">
                     <label for="payment-id">Payment ID</label>
                     <input type="text" id="payment-id" placeholder="e.g., PAY_12345" value="PAY_12345">
@@ -251,7 +446,7 @@
             
             <!-- Incident Investigation -->
             <div id="incident-tab" class="tab-content">
-                <h2>Incident Investigation</h2>
+                <h2 style="margin-bottom: 25px; font-weight: 600;">Incident Investigation</h2>
                 <div class="input-group">
                     <label for="incident-id">Incident ID</label>
                     <input type="text" id="incident-id" placeholder="e.g., INC100" value="INC100">
@@ -262,7 +457,7 @@
             
             <!-- Support Assistant -->
             <div id="support-tab" class="tab-content">
-                <h2>Support Assistant</h2>
+                <h2 style="margin-bottom: 25px; font-weight: 600;">Support Assistant</h2>
                 <div class="input-group">
                     <label for="support-query">Customer Query</label>
                     <textarea id="support-query" rows="4" placeholder="e.g., Why did my payment fail?">Why did my payment fail?</textarea>
@@ -277,11 +472,9 @@
         const API_BASE = 'http://localhost:8000/api/v1';
         
         function switchTab(tab) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
             
-            // Show selected tab
             document.getElementById(`${tab}-tab`).classList.add('active');
             event.target.classList.add('active');
         }
@@ -302,7 +495,7 @@
                 <div class="result">
                     <h3>Investigation Result</h3>
                     <div class="result-item">
-                        <label>Status:</label>
+                        <label>Status</label>
                         <span class="status ${statusClass}">${statusLabel}</span>
                     </div>
             `;
@@ -310,7 +503,7 @@
             if (data.payment_id) {
                 html += `
                     <div class="result-item">
-                        <label>Payment ID:</label>
+                        <label>Payment ID</label>
                         <p>${data.payment_id}</p>
                     </div>
                 `;
@@ -319,8 +512,30 @@
             if (data.incident_id) {
                 html += `
                     <div class="result-item">
-                        <label>Incident ID:</label>
+                        <label>Incident ID</label>
                         <p>${data.incident_id}</p>
+                    </div>
+                `;
+            }
+            
+            if (data.transaction) {
+                html += `
+                    <div class="result-item">
+                        <label>Transaction Details</label>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="value">$${data.transaction.amount?.toFixed(2) || '0.00'}</div>
+                                <div class="label">Amount</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="value">${data.transaction.issuer || 'N/A'}</div>
+                                <div class="label">Issuer</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="value">${data.transaction.status || 'N/A'}</div>
+                                <div class="label">Status</div>
+                            </div>
+                        </div>
                     </div>
                 `;
             }
@@ -328,12 +543,12 @@
             if (data.root_cause) {
                 html += `
                     <div class="result-item">
-                        <label>Root Cause:</label>
+                        <label>Root Cause</label>
                         <p>${data.root_cause.description || data.root_cause}</p>
-                    </div>
-                    <div class="result-item">
-                        <label>Confidence:</label>
-                        <p>${(data.confidence * 100).toFixed(1)}%</p>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${(data.confidence * 100)}%"></div>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.6);">Confidence: ${(data.confidence * 100).toFixed(1)}%</p>
                     </div>
                 `;
             }
@@ -341,8 +556,13 @@
             if (data.recommendation) {
                 html += `
                     <div class="result-item">
-                        <label>Recommendation:</label>
-                        <p>${data.recommendation.action || data.recommendation}</p>
+                        <label>Recommendation</label>
+                        <p><strong>${data.recommendation.action || data.recommendation}</strong></p>
+                        ${data.recommendation.steps ? `
+                            <ul class="steps-list">
+                                ${data.recommendation.steps.map(step => `<li>${step}</li>`).join('')}
+                            </ul>
+                        ` : ''}
                     </div>
                 `;
             }
@@ -350,7 +570,7 @@
             if (data.customer_explanation) {
                 html += `
                     <div class="result-item">
-                        <label>Customer Explanation:</label>
+                        <label>Customer Explanation</label>
                         <p>${data.customer_explanation}</p>
                     </div>
                 `;
@@ -359,7 +579,7 @@
             if (data.internal_explanation) {
                 html += `
                     <div class="result-item">
-                        <label>Internal Explanation:</label>
+                        <label>Internal Technical Explanation</label>
                         <pre>${data.internal_explanation}</pre>
                     </div>
                 `;
@@ -368,8 +588,8 @@
             if (data.error_message) {
                 html += `
                     <div class="result-item">
-                        <label>Error:</label>
-                        <p style="color: #721c24;">${data.error_message}</p>
+                        <label>Error</label>
+                        <p style="color: #ff6b6b;">${data.error_message}</p>
                     </div>
                 `;
             }
