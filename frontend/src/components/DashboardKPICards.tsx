@@ -13,6 +13,16 @@ export function DashboardKPICards() {
     refetchInterval: 30000, // Poll every 30 seconds
   });
 
+  // Use mock data as fallback if API fails or during loading
+  const mockMetrics = {
+    success_rate: 94.5,
+    failure_rate: 5.5,
+    avg_latency: 234,
+    open_incidents: 3
+  };
+
+  const metricsData = metrics?.data || mockMetrics;
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -24,16 +34,6 @@ export function DashboardKPICards() {
       </div>
     );
   }
-
-  // Use mock data as fallback if API fails
-  const mockMetrics = {
-    success_rate: 94.5,
-    failure_rate: 5.5,
-    avg_latency: 234,
-    open_incidents: 3
-  };
-
-  const metricsData = metrics?.data || mockMetrics;
 
   const kpiCards = [
     {
