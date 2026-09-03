@@ -21,8 +21,8 @@ class Settings(BaseSettings):
     CHROMADB_PERSIST_DIRECTORY: str = "./data/chromadb"
     
     # Ollama
-    OLLAMA_BASE_URL: str = "http://10.88.0.7:11434"
-    OLLAMA_MODEL: str = "phi3:latest"
+    OLLAMA_BASE_URL: str = "http://172.18.57.219:11434"
+    OLLAMA_MODEL: str = "qwen2.5:7b"
     
     # LangChain
     LANGCHAIN_TRACING_V2: bool = False
