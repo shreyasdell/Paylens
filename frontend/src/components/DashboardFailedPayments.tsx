@@ -4,6 +4,7 @@ import { Skeleton } from "./ui/Skeleton";
 import { ErrorCodeBadge } from "./ui/ErrorCodeBadge";
 import { formatCurrency, formatRelativeTime } from "@/lib/utils";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface FailedPayment {
   payment_id: string;
@@ -40,6 +41,11 @@ const mockFailedPayments: FailedPayment[] = [
 
 export function DashboardFailedPayments() {
   const isLoading = false; // Using mock data for now
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (isLoading) {
     return (
@@ -71,7 +77,11 @@ export function DashboardFailedPayments() {
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span>{payment.issuer}</span>
                 <span>{formatCurrency(payment.amount)}</span>
-                <span suppressHydration>{formatRelativeTime(payment.timestamp)}</span>
+                {isClient ? (
+                  <span>{formatRelativeTime(payment.timestamp)}</span>
+                ) : (
+                  <span>...</span>
+                )}
               </div>
             </div>
             <Link
