@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Link } from "next/link";
+import Link from "next/link";
 import { Home, RefreshCw } from "lucide-react";
 
 export default function Error({
@@ -25,11 +25,9 @@ export default function Error({
             <RefreshCw className="h-4 w-4" />
             Try Again
           </Button>
-          <Link href="/">
-            <Button variant="secondary" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              Go Home
-            </Button>
+          <Link href="/" className="btn-secondary flex items-center gap-2">
+            <Home className="h-4 w-4" />
+            Go Home
           </Link>
         </div>
       </div>

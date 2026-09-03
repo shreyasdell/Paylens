@@ -13,14 +13,14 @@ interface FailedPayment {
   timestamp: string;
 }
 
-// Mock data for failed payments
+// Mock data for failed payments with fixed timestamps to avoid hydration issues
 const mockFailedPayments: FailedPayment[] = [
   {
     payment_id: "PAY_12345",
     amount: 1917.69,
     issuer: "ICICI",
     error_code: "E4015",
-    timestamp: "2026-08-31T10:05:35.229486",
+    timestamp: "2026-09-01T10:05:35.229486",
   },
   {
     payment_id: "PAY_12346",
@@ -34,7 +34,7 @@ const mockFailedPayments: FailedPayment[] = [
     amount: 2341.00,
     issuer: "Axis",
     error_code: "E5003",
-    timestamp: "2026-08-31T09:30:45.789012",
+    timestamp: "2026-08-29T09:30:45.789012",
   },
 ];
 
@@ -71,7 +71,7 @@ export function DashboardFailedPayments() {
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span>{payment.issuer}</span>
                 <span>{formatCurrency(payment.amount)}</span>
-                <span>{formatRelativeTime(payment.timestamp)}</span>
+                <span suppressHydration>{formatRelativeTime(payment.timestamp)}</span>
               </div>
             </div>
             <Link
